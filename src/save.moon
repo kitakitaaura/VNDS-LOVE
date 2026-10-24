@@ -46,7 +46,10 @@ preview_slot = (i, fn, save, info) ->
 slot_ui = (base_dir, existing_slot, new_slot, closable = true) ->
 	choices = {}
 	for i = 1, 10
-		fn = base_dir.."/save#{i}.json"
+		save_dir = "saves/" .. base_dir\gsub("^novels/", "")
+		lfs.createDirectory("saves")
+		lfs.createDirectory(save_dir)
+		fn = save_dir.."/save#{i}.json"
 		info = lfs.getInfo(fn)
 		if info
 			save = json.decode(lfs.read(fn))

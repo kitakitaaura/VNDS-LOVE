@@ -49,8 +49,14 @@ next_msg = (ins) ->
 	switch ins.type
 		when "text"
 			if ins.text == "~" then next_msg!
-			else dispatch "text", ins
+			else
+				-- noberu: the line, marked, for the page's reading tools (its
+				-- runtime.js takes marked lines out of the console)
+				if love.system.getOS! == "Web" then print "@@noberu\t\t"..ins.text\gsub("\n", "\\n")
+				dispatch "text", ins
 		when "choice"
+			if love.system.getOS! == "Web" then
+				print "@@noberu\t@choice\t"..table.concat([tostring(c) for c in *ins.choices], "\\n")
 			dispatch "choice", ins
 		when "delay"
 			Timer.after(ins.frames/60, -> next_msg!)
@@ -60,6 +66,14 @@ next_msg = (ins) ->
 			next_msg!
 on "next_ins", next_msg
 love.load = ->
+    love.resize(lg.getWidth!, lg.getHeight!)
+
+    if love._browser_loading
+        return
+
+    dispatch "load"
+
+    lfs.createDirectory("/novels")
 	-- love.window.setMode(400, 240)
 	love.resize(lg.getWidth!, lg.getHeight!)
 	dispatch "load"
